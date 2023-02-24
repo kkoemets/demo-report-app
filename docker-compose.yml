@@ -1,0 +1,37 @@
+version: '3'
+networks:
+  docker-network:
+    driver: bridge
+services:
+  redis:
+    image: redis:latest
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - docker-network
+  node-ubuntu:
+    image: sitespeedio/node:ubuntu-20.04-nodejs-18.12.0
+    volumes:
+      - ./report-api/src:/report-api/src
+      - ./report-api/package.json:/report-api/package.json
+      - ./report-api/package-lock.json:/report-api/package-lock.json
+      - ./report-api/setup_exporter.sh:/report-api/setup_exporter.sh
+      - ./report-api/tsconfig.json:/report-api/tsconfig.json
+      - ./report-api/tsconfig.build.json:/report-api/tsconfig.build.json
+    ports:
+      - "3000:3000"
+    networks:
+      - docker-network
+    environment:
+      - REDIS_HOST=redis
+    command: |
+      sh -c "apt-get update && 
+      apt-get install -y libfontconfig && 
+      cd report-api && npm install && 
+      bash setup_exporter.sh && 
+      npm run build && 
+      node dist/main.js"
+volumes:
+  redis_data:

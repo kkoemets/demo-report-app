@@ -1,9 +1,8 @@
 {
-  "name": "chart-api-frontend",
+  "name": "report-ui",
   "description": "",
   "version": "1.0.0",
   "main": "src/index.tsx",
-  "repository": "https://github.com/GR34SE/react-typescript-starter.git",
   "license": "MIT",
   "scripts": {
     "develop": "webpack-cli serve --mode=development --env development --open --hot",
