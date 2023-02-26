@@ -1,12 +1,10 @@
-import { Module } from '@nestjs/common';
-import { GeneratePdf, JobService } from './job.service';
+import { DynamicModule, Module, Type } from '@nestjs/common';
+import { GeneratePdf, JobService, reportJobName } from './job.service';
 import { ReportModule } from '../report/report.module';
 import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { BullModule } from '@nestjs/bullmq';
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-export const imports: [] = [
+export const imports: (Type | DynamicModule)[] = [
   ReportModule,
   RedisModule.forRoot({
     config: {
@@ -21,7 +19,7 @@ export const imports: [] = [
     },
   }),
   BullModule.registerQueue({
-    name: 'report',
+    name: reportJobName,
   }),
 ];
 

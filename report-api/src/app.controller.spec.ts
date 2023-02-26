@@ -29,6 +29,7 @@ describe('AppController', () => {
       },
       send: (json) => (responseJson = json),
     } as unknown as Response;
+
     beforeAll(() => {
       resultStatus = null;
       responseJson = null;

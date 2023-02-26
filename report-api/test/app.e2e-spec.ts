@@ -45,7 +45,7 @@ describe('AppController (e2e)', () => {
       expect(response.body.status).toBe('unknown');
     });
 
-    it('should return report status after request to generate report had been sent', async () => {
+    it('should return report status pending after request to generate report had been sent', async () => {
       const initResponse: request.Response = await request(app.getHttpServer())
         .post('/api/v1/crypto/report')
         .send({

@@ -57,7 +57,7 @@ export class AppController {
     }
 
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'attachment; filename=report.pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=report-${id}.pdf`);
 
     res.send(Buffer.from(pdf, 'base64'));
   }

@@ -18,11 +18,9 @@ interface JobRequest {
   data: GenerateReportMessage;
 }
 
-interface JobPayload {
-  referenceId: string;
-}
-
 const jobRequestsKey: string = 'jobRequests';
+
+export const reportJobName: string = 'report';
 
 @Injectable()
 export class JobService {
@@ -36,7 +34,7 @@ export class JobService {
   async sendReportGenerationJobMessage(
     data: GenerateReportMessage,
   ): Promise<string> {
-    const jobName: string = 'report';
+    const jobName: string = reportJobName;
     this.logger.log(`Adding job ${jobName} to queue`);
 
     const id: string = uuidv4();
@@ -49,7 +47,7 @@ export class JobService {
 
     await this.reportQueue.add(jobName.toString(), {
       referenceId: id,
-    } as JobPayload);
+    });
 
     this.logger.log(`Added ${jobName} to queue, id ${id}`);
     return id;
@@ -64,7 +62,7 @@ export class JobService {
   }
 }
 
-@Processor('report')
+@Processor(reportJobName)
 export class GeneratePdf extends WorkerHost {
   private readonly logger = new Logger(GeneratePdf.name);
   constructor(
@@ -85,7 +83,14 @@ export class GeneratePdf extends WorkerHost {
       return;
     }
 
-    await this.reportService.generateCandlestickChartPdfReport(referenceId);
+    const { currency, periodStart, periodEnd, candleInterval } =
+      jobRequest.data;
+    await this.reportService.generateCandlestickChartPdfReport(referenceId, {
+      periodStart,
+      periodEnd,
+      currency,
+      candleInterval,
+    });
 
     await this.redis.hdel(jobRequestsKey, referenceId);
 

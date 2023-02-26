@@ -11,7 +11,7 @@ services:
       - "6379:6379"
     networks:
       - docker-network
-  node-ubuntu:
+  report-api:
     image: sitespeedio/node:ubuntu-20.04-nodejs-18.12.0
     volumes:
       - ./report-api/src:/report-api/src
@@ -29,9 +29,29 @@ services:
     command: |
       sh -c "apt-get update && 
       apt-get install -y libfontconfig && 
-      cd report-api && npm install && 
+      cd report-api && 
+      npm ci && 
       bash setup_exporter.sh && 
       npm run build && 
       node dist/main.js"
+  ui:
+    image: node:18.13-alpine3.16
+    volumes:
+      - ./ui/src:/ui/src
+      - ./ui/public:/ui/public
+      - ./ui/package.json:/ui/package.json
+      - ./ui/tsconfig.json:/ui/tsconfig.json
+      - ./ui/webpack.config.ts:/ui/webpack.config.ts
+      - ./ui/.eslintrc.json:/ui/.eslintrc.json
+    ports:
+      - "8080:8080"
+    networks:
+      - docker-network
+    environment:
+      - API_HOST=http://report-api:3000
+    command: |
+      sh -c "cd ui && 
+      npm install && 
+      npm run develop"
 volumes:
   redis_data:

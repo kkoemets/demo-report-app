@@ -12,6 +12,13 @@ const exportChart: (data: unknown) => { data: string } = util.promisify(
 );
 process.env.OPENSSL_CONF = '/dev/null';
 
+export interface GenerateCandlestickChartPdfReportDto {
+  periodStart: Date;
+  periodEnd: Date;
+  currency: string;
+  candleInterval: string;
+}
+
 @Injectable()
 export class ReportService {
   private readonly logger = new Logger(ReportService.name);
@@ -19,10 +26,13 @@ export class ReportService {
 
   constructor(@InjectRedis() private readonly redis: Redis) {}
 
-  async generateCandlestickChartPdfReport(referenceId): Promise<void> {
+  async generateCandlestickChartPdfReport(
+    referenceId: string,
+    dto: GenerateCandlestickChartPdfReportDto,
+  ): Promise<void> {
     this.logger.log('Generating candlestick chart PDF report');
     const doc: PDFDocument = new PDFDocument();
-    await generateChart(doc);
+    await generateChart(doc, dto);
 
     doc.end();
 
@@ -39,13 +49,16 @@ export class ReportService {
   }
 }
 
-const generateChart: (doc) => Promise<void> = async (doc) => {
+const generateChart: (doc, dto) => Promise<void> = async (
+  doc,
+  dto: GenerateCandlestickChartPdfReportDto,
+) => {
   const chartConfig: unknown = {
     chart: {
       type: 'candlestick',
     },
     title: {
-      text: 'Bitcoin Price',
+      text: 'Price chart',
     },
     subtitle: {
       text: 'Source: crypto data provider',
@@ -66,7 +79,7 @@ const generateChart: (doc) => Promise<void> = async (doc) => {
     },
     series: [
       {
-        name: 'BTC',
+        name: dto.currency,
         type: 'candlestick',
         data: [
           [1538908800000, 6587.63, 6624.94, 6528.75, 6594.98],
@@ -90,7 +103,6 @@ const generateChart: (doc) => Promise<void> = async (doc) => {
     ],
   };
 
-  // Set up the export server
   await exportServer.initPool();
 
   const res: { data: string } = await exportChart({

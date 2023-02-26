@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This script is used to setup the exporter for the backend
+# This script is used to setup the highcharts-export-server for the backend
 export ACCEPT_HIGHCHARTS_LICENSE="1"
 export HIGHCHARTS_USE_STYLED=""
 export HIGHCHARTS_USE_MAPS=""

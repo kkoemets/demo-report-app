@@ -1,9 +1,15 @@
 import path from "path";
-import webpack, {Configuration} from "webpack";
+import webpack from "webpack";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import ForkTsCheckerWebpackPlugin from "fork-ts-checker-webpack-plugin";
 import ESLintPlugin from "eslint-webpack-plugin";
 import {TsconfigPathsPlugin} from "tsconfig-paths-webpack-plugin";
+import {Configuration as WebpackDevServerConfiguration} from "webpack-dev-server";
+import {WebpackConfiguration} from "webpack-cli";
+
+interface Configuration extends WebpackConfiguration {
+    devServer?: WebpackDevServerConfiguration;
+}
 
 const webpackConfig = (env): Configuration => ({
     entry: "./src/index.tsx",
@@ -25,6 +31,10 @@ const webpackConfig = (env): Configuration => ({
                     transpileOnly: true
                 },
                 exclude: /dist/
+            },
+            {
+                test: /\.css$/,
+                use: ["style-loader", "css-loader"]
             }
         ]
     },
@@ -39,7 +49,15 @@ const webpackConfig = (env): Configuration => ({
         }),
         new ForkTsCheckerWebpackPlugin(),
         new ESLintPlugin({files: "./src/**/*.{ts,tsx,js,jsx}"})
-    ]
+    ],
+    devServer: {
+        proxy: {
+            "/api": {
+                target: "http://localhost:8080",
+                router: () => process.env.API_HOST || "http://localhost:3000"
+            }
+        }
+    }
 });
 
 export default webpackConfig;
