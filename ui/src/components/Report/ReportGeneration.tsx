@@ -1,8 +1,10 @@
-import React, {useEffect, useRef} from "react";
+import React, {useEffect, useState} from "react";
+import {useInterval} from "usehooks-ts";
 
 const ReportGeneration = ({id, onBack}) => {
-    const [completed, setCompleted] = React.useState<boolean>(false);
-    const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
+    const [completed, setCompleted] = useState<boolean>(false);
+    const delay = 2000;
 
     const fetchStatus = React.useCallback(
         () =>
@@ -35,8 +37,7 @@ const ReportGeneration = ({id, onBack}) => {
         () => {
             fetchStatus();
         },
-        2000,
-        !completed && !errorMsg
+        !completed && !errorMsg ? delay : null
     );
 
     if (errorMsg) {
@@ -69,27 +70,4 @@ const ReportGeneration = ({id, onBack}) => {
     );
 };
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-function useInterval(callback: Function, delay: number, enabled = true) {
-    // eslint-disable-next-line @typescript-eslint/ban-types,@typescript-eslint/no-empty-function
-    const savedCallback = useRef<Function>(() => {});
-
-    useEffect(() => {
-        savedCallback.current = callback;
-    }, [callback]);
-
-    useEffect(() => {
-        function tick() {
-            savedCallback.current?.();
-        }
-
-        let id = null;
-
-        if (enabled && delay !== null) {
-            id = setInterval(tick, delay);
-        }
-
-        return () => clearInterval(id);
-    }, [delay, enabled]);
-}
 export default ReportGeneration;

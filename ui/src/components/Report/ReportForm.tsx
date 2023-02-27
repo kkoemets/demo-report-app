@@ -1,9 +1,9 @@
-import React from "react";
+import React, {useState} from "react";
 import {Formik} from "formik";
 import {DatePicker, Form, Select, SubmitButton} from "formik-antd";
 
 const ReportForm = ({setReportId}) => {
-    const [apiErrorMsg, setApiErrorMsg] = React.useState<string>("");
+    const [apiErrorMsg, setApiErrorMsg] = useState<string>("");
 
     return (
         <Formik

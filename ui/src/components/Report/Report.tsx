@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import styled from "styled-components";
 import {useNavigate, useParams} from "react-router-dom";
 import ReportForm from "components/Report/ReportForm";
@@ -14,8 +14,8 @@ const Container = styled.div`
 
 const Report: React.FC = () => {
     const {id} = useParams();
-    const [reportId, setReportId] = React.useState<string | null>(id);
-    const [currentForm, setCurrentForm] = React.useState<React.ReactNode>(
+    const [reportId, setReportId] = useState<string | null>(id);
+    const [currentForm, setCurrentForm] = useState<React.ReactNode>(
         <ReportForm setReportId={setReportId} />
     );
 
